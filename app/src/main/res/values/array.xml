@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="units_List">
+        <item>Kilograms</item>
+        <item>Stone</item>
+        <item>Pounds</item>
+        <item>Ounce</item>
+        <item>Tonne</item>
+        <item>Gram</item>
+    </string-array>
+</resources>
