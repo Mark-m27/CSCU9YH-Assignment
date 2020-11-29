@@ -3,6 +3,7 @@ package com.example.unitconversionapp;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -35,6 +36,16 @@ public class MainActivity extends AppCompatActivity {
 
         //Create or Open Database
         DatabaseHelper db = new DatabaseHelper(this);
+        success = db.seedDatabase();
+        //Checks if Database has been succesfully created
+        if ((success))
+        {
+            Toast.makeText(MainActivity.this, "Database Started...", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(MainActivity.this, "Failed to Seed Database", Toast.LENGTH_SHORT).show();
+        }
 
 
 

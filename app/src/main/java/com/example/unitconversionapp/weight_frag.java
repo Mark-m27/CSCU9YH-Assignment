@@ -18,8 +18,10 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class weight_frag extends Fragment implements AdapterView.OnItemSelectedListener {
@@ -31,6 +33,22 @@ public class weight_frag extends Fragment implements AdapterView.OnItemSelectedL
     Spinner units;
     ListView units_list_view;
     ListView values_list_view;
+    ArrayList<String> Conversions = new ArrayList<String>();
+    //init Completed Conversion Values
+    double kg;
+    double pounds;
+    double stone;
+    double ounce;
+    double tonne;
+    double gram;
+
+    DecimalFormat df = new DecimalFormat("0.000");
+    DecimalFormat df2 = new DecimalFormat("0.00");
+
+    //Database
+    DatabaseHelper db = new DatabaseHelper(getActivity());
+
+
 
 
 
@@ -55,6 +73,7 @@ public class weight_frag extends Fragment implements AdapterView.OnItemSelectedL
         units_list_view = (ListView) view.findViewById(R.id.unit_listView);
         values_list_view = (ListView) view.findViewById(R.id.value_listView);
 
+        DatabaseHelper db = new DatabaseHelper(getActivity());
 
         //Set OnClick Listener for Convert Button
         convert_btn.setOnClickListener(new View.OnClickListener() {
@@ -67,10 +86,7 @@ public class weight_frag extends Fragment implements AdapterView.OnItemSelectedL
         //Set OnClick Listener for Clear Button
         clear_btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                DatabaseHelper db = new DatabaseHelper(getActivity());
-                List<ConversionsModel> model = db.getKG();
-                Toast.makeText(getActivity(), model.toString(), Toast.LENGTH_SHORT).show();
+            public void onClick(View v) { Clear();
             }
         });
 
@@ -89,15 +105,203 @@ public class weight_frag extends Fragment implements AdapterView.OnItemSelectedL
 
     public void Convert()
     {
+        //Gets Value To Be converted from user
         weightValue = weightInput.getText().toString();
+        DatabaseHelper db = new DatabaseHelper(getActivity());
 
 
-        //ArrayAdapter valueAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, arrayList);
-        //values_list_view.setAdapter(valueAdapter);
-        Toast.makeText(getActivity(), String.valueOf(weightValue) + " " + unit, Toast.LENGTH_SHORT).show();
+        //The unit is converting from kilograms
+        HashMap<String, ConversionsModel> weightConversions = db.getWeights();
+
+        //Case Statement that allows the db to retrieve the correct multipliers for the conversion
+        switch (unit)
+        {
+            case "Kilograms":
+                try {
+                    //Get required multipliers from database
+                    ConversionsModel a = weightConversions.get("KGtoKG");
+                    ConversionsModel b = weightConversions.get("KGtoPounds");
+                    ConversionsModel c = weightConversions.get("KGtoStone");
+                    ConversionsModel d = weightConversions.get("KGtoOunce");
+                    ConversionsModel e = weightConversions.get("KGtoTonne");
+                    ConversionsModel f = weightConversions.get("KGtoGram");
+
+                    //Calculate Conversions
+
+                    kg = (Double.parseDouble(weightValue) * a.getMultiplier());
+                    pounds = (Double.parseDouble(weightValue) * b.getMultiplier());
+                    stone = (Double.parseDouble(weightValue) * c.getMultiplier());
+                    ounce = (Double.parseDouble(weightValue) * d.getMultiplier());
+                    tonne = (Double.parseDouble(weightValue) * e.getMultiplier());
+                    gram = (Double.parseDouble(weightValue) * f.getMultiplier());
+
+                    Conversions = populateValueList(kg, pounds, stone, ounce, tonne, gram);
+
+                }
+
+                catch (Exception ex)
+                {
+                  Toast.makeText(getActivity(), "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                  ex.printStackTrace();
+                }
+
+                break;
+            case "Pounds":
+                try {
+                    //Get required multipliers from database
+                    ConversionsModel a = weightConversions.get("LBStoKG");
+                    ConversionsModel b = weightConversions.get("LBStoLBS");
+                    ConversionsModel c = weightConversions.get("LBStoStone");
+                    ConversionsModel d = weightConversions.get("LBStoOunce");
+                    ConversionsModel e = weightConversions.get("LBStoTonne");
+                    ConversionsModel f = weightConversions.get("LBStoGram");
+
+                    //Calculate Conversions
+
+                    kg = (Double.parseDouble(weightValue) * a.getMultiplier());
+                    pounds = (Double.parseDouble(weightValue) * b.getMultiplier());
+                    stone = (Double.parseDouble(weightValue) * c.getMultiplier());
+                    ounce = (Double.parseDouble(weightValue) * d.getMultiplier());
+                    tonne = (Double.parseDouble(weightValue) * e.getMultiplier());
+                    gram = (Double.parseDouble(weightValue) * f.getMultiplier());
+
+                    Conversions = populateValueList(kg, pounds, stone, ounce, tonne, gram);
+
+                }
+
+                catch (Exception ex)
+                {
+                    Toast.makeText(getActivity(), "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    ex.printStackTrace();
+                }
+
+                break;
+            case "Stone":
+                try {
+                    //Get required multipliers from database
+                    ConversionsModel a = weightConversions.get("StonetoKG");
+                    ConversionsModel b = weightConversions.get("StonetoLBS");
+                    ConversionsModel c = weightConversions.get("StonetoStone");
+                    ConversionsModel d = weightConversions.get("StonetoOunce");
+                    ConversionsModel e = weightConversions.get("StonetoTonne");
+                    ConversionsModel f = weightConversions.get("StonetoGram");
+
+                    //Calculate Conversions
+
+                    kg = (Double.parseDouble(weightValue) * a.getMultiplier());
+                    pounds = (Double.parseDouble(weightValue) * b.getMultiplier());
+                    stone = (Double.parseDouble(weightValue) * c.getMultiplier());
+                    ounce = (Double.parseDouble(weightValue) * d.getMultiplier());
+                    tonne = (Double.parseDouble(weightValue) * e.getMultiplier());
+                    gram = (Double.parseDouble(weightValue) * f.getMultiplier());
+
+                    Conversions = populateValueList(kg, pounds, stone, ounce, tonne, gram);
+
+                }
+
+                catch (Exception ex)
+                {
+                    Toast.makeText(getActivity(), "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    ex.printStackTrace();
+                }
+                break;
+            case "Ounce":
+                try {
+                    //Get required multipliers from database
+                    ConversionsModel a = weightConversions.get("OuncetoKG");
+                    ConversionsModel b = weightConversions.get("OuncetoLBS");
+                    ConversionsModel c = weightConversions.get("OuncetoStone");
+                    ConversionsModel d = weightConversions.get("OuncetoOunce");
+                    ConversionsModel e = weightConversions.get("OuncetoTonne");
+                    ConversionsModel f = weightConversions.get("OuncetoGram");
+
+                    //Calculate Conversions
+
+                    kg = (Double.parseDouble(weightValue) * a.getMultiplier());
+                    pounds = (Double.parseDouble(weightValue) * b.getMultiplier());
+                    stone = (Double.parseDouble(weightValue) * c.getMultiplier());
+                    ounce = (Double.parseDouble(weightValue) * d.getMultiplier());
+                    tonne = (Double.parseDouble(weightValue) * e.getMultiplier());
+                    gram = (Double.parseDouble(weightValue) * f.getMultiplier());
+
+                    Conversions = populateValueList(kg, pounds, stone, ounce, tonne, gram);
+
+                }
+
+                catch (Exception ex)
+                {
+                    Toast.makeText(getActivity(), "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    ex.printStackTrace();
+                }
+                break;
+            case "Tonne":
+                try {
+                    //Get required multipliers from database
+                    ConversionsModel a = weightConversions.get("TonnetoKG");
+                    ConversionsModel b = weightConversions.get("TonnetoLBS");
+                    ConversionsModel c = weightConversions.get("TonnetoStone");
+                    ConversionsModel d = weightConversions.get("TonnetoOunce");
+                    ConversionsModel e = weightConversions.get("TonnetoTonne");
+                    ConversionsModel f = weightConversions.get("TonnetoGram");
+
+                    //Calculate Conversions
+
+                    kg = (Double.parseDouble(weightValue) * a.getMultiplier());
+                    pounds = (Double.parseDouble(weightValue) * b.getMultiplier());
+                    stone = (Double.parseDouble(weightValue) * c.getMultiplier());
+                    ounce = (Double.parseDouble(weightValue) * d.getMultiplier());
+                    tonne = (Double.parseDouble(weightValue) * e.getMultiplier());
+                    gram = (Double.parseDouble(weightValue) * f.getMultiplier());
+
+                    Conversions = populateValueList(kg, pounds, stone, ounce, tonne, gram);
+
+                }
+
+                catch (Exception ex)
+                {
+                    Toast.makeText(getActivity(), "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    ex.printStackTrace();
+                }
+                break;
+            case"Gram":
+                try {
+                    //Get required multipliers from database
+                    ConversionsModel a = weightConversions.get("GramtoKG");
+                    ConversionsModel b = weightConversions.get("GramtoLBS");
+                    ConversionsModel c = weightConversions.get("GramtoStone");
+                    ConversionsModel d = weightConversions.get("GramtoOunce");
+                    ConversionsModel e = weightConversions.get("GramtoTonne");
+                    ConversionsModel f = weightConversions.get("GramtoGram");
+
+                    //Calculate Conversions
+
+                    kg = (Double.parseDouble(weightValue) * a.getMultiplier());
+                    pounds = (Double.parseDouble(weightValue) * b.getMultiplier());
+                    stone = (Double.parseDouble(weightValue) * c.getMultiplier());
+                    ounce = (Double.parseDouble(weightValue) * d.getMultiplier());
+                    tonne = (Double.parseDouble(weightValue) * e.getMultiplier());
+                    gram = (Double.parseDouble(weightValue) * f.getMultiplier());
+
+                    Conversions = populateValueList(kg, pounds, stone, ounce, tonne, gram);
+
+                }
+
+                catch (Exception ex)
+                {
+                    Toast.makeText(getActivity(), "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    ex.printStackTrace();
+                }
+                break;
+
+        }
+
+        //Sets List View to correct
+        ArrayAdapter valueAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, Conversions);
+        values_list_view.setAdapter(valueAdapter);
+        //Toast.makeText(getActivity(), String.valueOf(weightValue) + " " + unit, Toast.LENGTH_SHORT).show();
     }
 
-    //Required Methods for implmenting onItemSelectedListener
+    //Required Methods for implementing onItemSelectedListener
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
@@ -116,19 +320,31 @@ public class weight_frag extends Fragment implements AdapterView.OnItemSelectedL
 
     }
 
-    /*
-            //Test value list view
-        int[] valueList = new int[6];
-              valueList[0] = 98;
-              valueList[1] = 32;
-              valueList[2] = 56;
-              valueList[3] = 77;
-              valueList[4] = 67;
-              valueList[5] = 88;
+    //Clears Contents of EditText
+    public void Clear()
+    {
+        weightInput.setText("");
+        Conversions.clear();
+        values_list_view.setAdapter(null);
+    }
+
+    //This method takes in the 6 conversions and adds them to a list to be displayed in list view
+    public ArrayList populateValueList(double a, double b, double c, double d, double e, double f)
+    {
+        double[] valueList = new double[6];
+        //Test value list view
+        valueList[0] = Double.parseDouble(df.format(a));
+        valueList[1] = Double.parseDouble(df.format(b));
+        valueList[2] = Double.parseDouble(df.format(c));
+        valueList[3] = Double.parseDouble(df2.format(d));
+        valueList[4] = Double.parseDouble(df.format(e));
+        valueList[5] = Double.parseDouble(df.format(f));
 
         ArrayList<String> arrayList = new ArrayList<String>();
-        for(int s:valueList) {
+        for (double s : valueList)
+        {
             arrayList.add(String.valueOf(s));
         }
-     */
+        return arrayList;
+    }
 }
