@@ -1,11 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="units_List">
-        <item>Kilograms</item>
-        <item>Pounds</item>
-        <item>Stone</item>
-        <item>Ounce</item>
-        <item>Tonne</item>
-        <item>Gram</item>
+    <item>Kilograms</item>
+    <item>Pounds</item>
+    <item>Stone</item>
+    <item>Ounce</item>
+    <item>Tonne</item>
+    <item>Gram</item>
+</string-array>
+    <string-array name="speed_List">
+        <item>MPH</item>
+        <item>KPH</item>
+        <item>M/S</item>
+        <item>Knots</item>
     </string-array>
+    <string-array name="distance_List">
+        <item>Centimetres</item>
+        <item>Millimetres</item>
+        <item>Feet</item>
+        <item>Miles</item>
+        <item>Kilometres</item>
+    </string-array>
+    <string-array name="time_List">
+        <item>Seconds</item>
+        <item>Minutes</item>
+        <item>Hours</item>
+        <item>Days</item>
+        <item>Weeks</item>
+    </string-array>
+    <string-array name="volume_List">
+        <item>Millilitres</item>
+        <item>Litre</item>
+        <item>Pints</item>
+        <item>Gallon</item>
+    </string-array>
+    <string-array name="temp_List">
+        <item>Kelvin</item>
+        <item>Celsius</item>
+        <item>Fahrenheit</item>
+    </string-array>
+    <string-array name="storage_List">
+        <item>Kilobytes</item>
+        <item>Megabytes</item>
+        <item>Gigabytes</item>
+        <item>Terabytes</item>
+    </string-array>
+
 </resources>

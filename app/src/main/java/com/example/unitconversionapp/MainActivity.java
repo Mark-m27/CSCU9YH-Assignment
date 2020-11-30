@@ -63,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new distance_frag(), "Distance Fragment");
         adapter.addFragment(new time_frag(), "Time Fragment");
         adapter.addFragment(new volume_frag(), "Volume Fragment");
-        adapter.addFragment(new temp_frag(), "Temperature Fragment");
         adapter.addFragment(new storage_frag(), "Digital Storage Fragment");
+        adapter.addFragment(new temp_frag(), "Temperature Fragment");
         viewPager.setAdapter(adapter);
     }
 
@@ -75,24 +75,6 @@ public class MainActivity extends AppCompatActivity {
         ViewPager.setCurrentItem(fNumber);
     }
 
-    private void seedDatabase()
-    {
-        try
-        {
-            //Create the items within database the app will use
-            KGtoKG= new ConversionsModel(0, "KGtoKG", 1);
-            KGtoPounds= new ConversionsModel(1, "KGtoPounds", 2.205);
-            KGtoStone= new ConversionsModel(2, "KGtoStone",0.157473);
-            KGtoOunce= new ConversionsModel(3, "KGtoOunce", 35.274);
-            KGtoTonne= new ConversionsModel(4, "KGtoTonne", 0.001);
-            KGtoGram= new ConversionsModel(5, "KGtoGram", 1000);
-        }
-        catch (Exception ex)
-        {
-            Toast.makeText(MainActivity.this, "Failed to Seed Database", Toast.LENGTH_SHORT).show();
-            ConversionsModel KGtoFail = new ConversionsModel(6, "KGtoFail", -1);
-        }
-    }
 
 
 }

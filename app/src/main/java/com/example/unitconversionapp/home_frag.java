@@ -81,7 +81,7 @@ public class home_frag extends Fragment {
         dgStorage_table_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)getActivity()).setViewPager(8);
+                ((MainActivity)getActivity()).setViewPager(7);
             }
         });
         return view;
