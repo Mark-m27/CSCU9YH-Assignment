@@ -3,12 +3,8 @@ package com.example.unitconversionapp;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private PageAdapter pager;
@@ -64,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new time_frag(), "Time Fragment");
         adapter.addFragment(new volume_frag(), "Volume Fragment");
         adapter.addFragment(new storage_frag(), "Digital Storage Fragment");
-        adapter.addFragment(new temp_frag(), "Temperature Fragment");
+        adapter.addFragment(new custom_frag(), "Temperature Fragment");
         viewPager.setAdapter(adapter);
     }
 

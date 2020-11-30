@@ -28,11 +28,7 @@ public class ConversionsModel
 
     @Override
     public String toString() {
-        return "ConversionsModel{" +
-                "id=" + id +
-                ", classifier='" + classifier + '\'' +
-                ", multiplier=" + multiplier +
-                '}';
+        return classifier;
     }
 
     public int getId() {

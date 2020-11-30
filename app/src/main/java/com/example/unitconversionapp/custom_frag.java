@@ -20,20 +20,28 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class temp_frag extends Fragment implements AdapterView.OnItemSelectedListener {
+public class custom_frag extends Fragment implements AdapterView.OnItemSelectedListener {
     private static final String TAG = "Weight Fragment";
     String weightValue, unit;
     EditText weightInput;
+    EditText classifier_txt;
+    EditText multiplier_txt;
+    String classifer;
+    double multiplier;
     Button convert_btn;
     Button clear_btn;
+    Button add_btn;
     Spinner units;
     ListView units_list_view;
     ListView values_list_view;
     ArrayList<String> Conversions = new ArrayList<String>();
     //init Completed Conversion Values
-    double kelvin;
-    double celsius;
-    double fahrenheit;
+    double customVariable1;
+    double customVariable2;
+    double customVariable3;
+    double customVariable4;
+
+    ArrayList<ConversionsModel> weightConversions;
 
 
     DecimalFormat df = new DecimalFormat("0.000");
@@ -41,13 +49,14 @@ public class temp_frag extends Fragment implements AdapterView.OnItemSelectedLis
 
     //Database
     DatabaseHelper db = new DatabaseHelper(getActivity());
+    ArrayList<String> unitsList = new ArrayList<String>();
 
 
 
 
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.temp_fragment, container, false);
+        View view = inflater.inflate(R.layout.custom_fragment, container, false);
 
         //Setup Back Button for easy navigation
         ImageView back_btn = (ImageView) view.findViewById(R.id.BackBtn);
@@ -60,14 +69,18 @@ public class temp_frag extends Fragment implements AdapterView.OnItemSelectedLis
 
         //Finds items from fragment and sets as variable
         weightInput = (EditText) view.findViewById(R.id.user_input);
+        classifier_txt = (EditText) view.findViewById(R.id.classifier_txt);
+        multiplier_txt = (EditText) view.findViewById(R.id.multiplier_txt);
         units = (Spinner) view.findViewById(R.id.units_spinner);
         units.setOnItemSelectedListener(this);
         convert_btn = (Button) view.findViewById(R.id.convert_btn);
         clear_btn = (Button) view.findViewById(R.id.clear_btn);
+        add_btn = (Button) view.findViewById(R.id.add_btn);
         units_list_view = (ListView) view.findViewById(R.id.unit_listView);
         values_list_view = (ListView) view.findViewById(R.id.value_listView);
 
         DatabaseHelper db = new DatabaseHelper(getActivity());
+
 
         //Set OnClick Listener for Convert Button
         convert_btn.setOnClickListener(new View.OnClickListener() {
@@ -84,8 +97,21 @@ public class temp_frag extends Fragment implements AdapterView.OnItemSelectedLis
             }
         });
 
-        //Setup Spinner
-        String[] unitsList = getResources().getStringArray(R.array.temp_List);
+        //Set OnClick Listener for add button
+        add_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Add();
+            }
+        });
+
+        ArrayList<ConversionsModel> customConversions = db.getCustoms();
+
+        for (ConversionsModel key : customConversions)
+        {
+            unitsList.add(key.getClassifier());
+        }
+
         ArrayAdapter dropdownadapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item, unitsList);
         dropdownadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         units.setAdapter(dropdownadapter);
@@ -97,6 +123,48 @@ public class temp_frag extends Fragment implements AdapterView.OnItemSelectedLis
         return view;
     }
 
+    public void Add()
+    {
+        try
+        {
+            //Get Classifier and Multiplier from User Input
+            classifer = classifier_txt.getText().toString();
+            multiplier = Double.parseDouble(multiplier_txt.getText().toString());
+
+            //Create New Instance of a conversion from user input
+            ConversionsModel newModel = new ConversionsModel(classifer, multiplier);
+
+            //Add New Instance of Data to the database
+            DatabaseHelper db = new DatabaseHelper(getActivity());
+            db.addtoCustom(newModel);
+
+            ArrayList<ConversionsModel> dbCustoms = db.getCustoms();
+            //Toast.makeText(getActivity(), String.valueOf(customConversions.values()), Toast.LENGTH_SHORT).show();
+
+            //Setup Spinner
+            //Loop to get the key name from the hash table and place it in the units list view and spinner options
+
+            for (ConversionsModel key : dbCustoms)
+            {
+                unitsList.add(key.getClassifier());
+            }
+
+            ArrayAdapter dropdownadapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item, unitsList);
+            dropdownadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            units.setAdapter(dropdownadapter);
+
+            //Setup List View
+            ArrayAdapter listAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1,unitsList);
+            units_list_view.setAdapter(listAdapter);
+
+        }
+        catch (Exception ex)
+        {
+            Toast.makeText(getActivity(), "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+            ex.printStackTrace();
+        }
+    }
+
     public void Convert()
     {
         //Gets Value To Be converted from user
@@ -105,83 +173,35 @@ public class temp_frag extends Fragment implements AdapterView.OnItemSelectedLis
 
 
         //The unit is converting from kilograms
-        HashMap<String, ConversionsModel> weightConversions = db.getWeights();
+        weightConversions = db.getCustoms();
 
-        //Case Statement that allows the db to retrieve the correct multipliers for the conversion
-        switch (unit)
+        //Hashmap to get the individual values from the array list
+        HashMap<String,ConversionsModel> conversionsModelHashMap = new HashMap<String, ConversionsModel>();
+        //For Each Loop
+        for(ConversionsModel m : weightConversions)
         {
-            case "Kelvin":
-                try {
-                    //Get required multipliers from database
-                    ConversionsModel a = weightConversions.get("KelvintoKelvin");
-                    ConversionsModel b = weightConversions.get("KelvintoCelsius");
-                    ConversionsModel c = weightConversions.get("KelvintoFahrenheit");
-
-                    //Calculate Conversions
-
-                    kelvin = (Double.parseDouble(weightValue) * a.getMultiplier());
-                    celsius = (Double.parseDouble(weightValue) * b.getMultiplier());
-                    fahrenheit = (Double.parseDouble(weightValue) * c.getMultiplier());
-
-                    Conversions = populateValueList(kelvin, celsius, fahrenheit);
-
-                }
-
-                catch (Exception ex)
-                {
-                  Toast.makeText(getActivity(), "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
-                  ex.printStackTrace();
-                }
-
-                break;
-            case "Celsius":
-                try {
-                    //Get required multipliers from database
-                    ConversionsModel a = weightConversions.get("CelsiustoKelvin");
-                    ConversionsModel b = weightConversions.get("CelsiustoCelsius");
-                    ConversionsModel c = weightConversions.get("CelsiustoFahrenheit");
-                    //Calculate Conversions
-
-                    kelvin = (Double.parseDouble(weightValue) * a.getMultiplier());
-                    celsius = (Double.parseDouble(weightValue) * b.getMultiplier());
-                    fahrenheit = (Double.parseDouble(weightValue) * c.getMultiplier());
-
-                    Conversions = populateValueList(kelvin, celsius, fahrenheit);
-
-                }
-
-                catch (Exception ex)
-                {
-                    Toast.makeText(getActivity(), "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
-                    ex.printStackTrace();
-                }
-
-                break;
-            case "Fahrenheit":
-                try {
-                    //Get required multipliers from database
-                    ConversionsModel a = weightConversions.get("FahrenheittoKelvin");
-                    ConversionsModel b = weightConversions.get("FahrenheittoCelsius");
-                    ConversionsModel c = weightConversions.get("FahrenheittoFahrenheit");
-
-                    //Calculate Conversions
-
-                    kelvin = (Double.parseDouble(weightValue) * a.getMultiplier());
-                    celsius = (Double.parseDouble(weightValue) * b.getMultiplier());
-                    fahrenheit = (Double.parseDouble(weightValue) * c.getMultiplier());
-
-                    Conversions = populateValueList(kelvin, celsius, fahrenheit);
-
-                }
-
-                catch (Exception ex)
-                {
-                    Toast.makeText(getActivity(), "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
-                    ex.printStackTrace();
-                }
-                break;
-
+            conversionsModelHashMap.put(m.getClassifier(), m);
         }
+
+        try
+        {
+            //Get Required multipliers from the database
+            ConversionsModel a = conversionsModelHashMap.get(unitsList.get(0));
+
+
+            //Calculate Conversions
+            customVariable1 = (Double.parseDouble(weightValue) * a.getMultiplier());
+
+
+            Conversions = populateValueList(customVariable1);
+        }
+        catch (Exception ex)
+        {
+            Toast.makeText(getActivity(), "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+            ex.printStackTrace();
+        }
+
+
 
         //Sets List View to correct
         ArrayAdapter valueAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, Conversions);
@@ -217,13 +237,11 @@ public class temp_frag extends Fragment implements AdapterView.OnItemSelectedLis
     }
 
     //This method takes in the 6 conversions and adds them to a list to be displayed in list view
-    public ArrayList populateValueList(double a, double b, double c)
+    public ArrayList populateValueList(double a)
     {
-        double[] valueList = new double[3];
+        double[] valueList = new double[1];
         //Test value list view
         valueList[0] = Double.parseDouble(df.format(a));
-        valueList[1] = Double.parseDouble(df.format(b));
-        valueList[2] = Double.parseDouble(df.format(c));
 
         ArrayList<String> arrayList = new ArrayList<String>();
         for (double s : valueList)

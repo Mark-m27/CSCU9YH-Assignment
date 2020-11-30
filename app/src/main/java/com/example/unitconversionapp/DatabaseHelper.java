@@ -17,6 +17,7 @@ import java.util.Map;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "Conversion.DB";
     public static final String WEIGHT_TABLE = "WEIGHT_TABLE";
+    public static final String CUSTOM_TABLE = "CUSTOM_TABLE";
     public static final String COLUMN_CLASSIFIER = "CLASSIFIER";
     public static final String COLUMN_MULTIPLIER = "MULTIPLIER";
     public static final String COLUMN_ID = "ID";
@@ -28,8 +29,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db)
     {
+        //SQL Create Statement
+        //Creates two tables to store Conversion Models
         String createTableStatement = "CREATE TABLE " + WEIGHT_TABLE + " (" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_CLASSIFIER + " TEXT, " + COLUMN_MULTIPLIER + " REAL)";
+        String createTableStatement2 = "CREATE TABLE " + CUSTOM_TABLE + " (" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_CLASSIFIER + " TEXT, " + COLUMN_MULTIPLIER + " REAL)";
+
+        //Executes Statement
         db.execSQL(createTableStatement);
+        db.execSQL(createTableStatement2);
     }
 
     @Override
@@ -46,6 +53,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_MULTIPLIER, model.getMultiplier());
 
         long insert = db.insert(WEIGHT_TABLE, null, cv);
+        if (insert == -1 ) {
+            return false;
+        }
+        else if (insert == 1)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addtoCustom(ConversionsModel model)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(COLUMN_CLASSIFIER, model.getClassifier());
+        cv.put(COLUMN_MULTIPLIER, model.getMultiplier());
+
+        long insert = db.insert(CUSTOM_TABLE, null, cv);
         if (insert == -1 ) {
             return false;
         }
@@ -83,6 +109,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return elementList;
+    }
+
+    //Returns all user created classifiers
+    public ArrayList<ConversionsModel> getCustoms()
+    {
+        ArrayList<ConversionsModel> customList = new ArrayList<ConversionsModel>();
+        String queryString = "Select * FROM " + CUSTOM_TABLE;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(queryString, null);
+
+        if(cursor.moveToFirst())
+        {
+            //loop through results and create model for each classifier
+            do {
+                int id = cursor.getInt(0);
+                String classifier = cursor.getString(1);
+                double multiplier = cursor.getDouble(2);
+
+                ConversionsModel newModel = new ConversionsModel(id, classifier, multiplier);
+                customList.add(newModel);
+            }while(cursor.moveToNext());
+        }
+        else
+        {
+
+        }
+        cursor.close();
+        db.close();
+        return customList;
     }
 
     //Method to seed the database upon startup
